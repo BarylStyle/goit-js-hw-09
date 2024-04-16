@@ -1,4 +1,3 @@
-
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import Notiflix from 'notiflix';
@@ -20,6 +19,16 @@ function convertMS(ms) {
 function addLeadingZero(value) {
       return String(value).padStart(2, '0');
 }
+let intervalId;
+
+const resetCounter = () => {
+    clearInterval(intervalId);
+    document.querySelector('[data-days]').textContent = '00';
+    document.querySelector('[data-hours]').textContent = '00';
+    document.querySelector('[data-minutes]').textContent = '00';
+    document.querySelector('[data-seconds]').textContent = '00';
+};
+
 const dateTimePicker = flatpickr('#datetime-picker', {
     enableTime: true,
     time_24hr: true,
@@ -29,10 +38,11 @@ const dateTimePicker = flatpickr('#datetime-picker', {
         const selectedDate = selectedDates[0];
         const currentDate = new Date();
         if (selectedDate <= currentDate) {
-          Notiflix.Notify.failure('Please choose a date in the future');
-          document.querySelector('[data-start]').disabled = true;
+            Notiflix.Notify.failure('Please choose a date in the future');
+            document.querySelector('[data-start]').disabled = true;
         } else {
             document.querySelector('[data-start]').disabled = false;
+            resetCounter();
         }
     },
 });
@@ -41,7 +51,7 @@ document.querySelector('[data-start]').addEventListener('click', () => {
     const endDate = dateTimePicker.selectedDates[0];
     const currentDate = new Date();
 
-    const intervalId = setInterval(() => {
+    intervalId = setInterval(() => {
         const remainingTime = endDate - currentDate;
         if (remainingTime <= 0) {
             clearInterval(intervalId);
@@ -54,7 +64,5 @@ document.querySelector('[data-start]').addEventListener('click', () => {
         document.querySelector('[data-seconds]').textContent = addLeadingZero(seconds);
 
         currentDate.setSeconds(currentDate.getSeconds() + 1);
-        
     }, 1000);
 });
-
